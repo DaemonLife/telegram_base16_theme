@@ -1,5 +1,4 @@
 # telegram_base16_theme
-base16 theme for telegram desktop 
 
 usage: main.py [-h] [-u] [-b BASE16_THEME]                                    
 
