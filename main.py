@@ -188,7 +188,7 @@ def main():
 
 if __name__ == "__main__":
     # Program options
-    parser = argparse.ArgumentParser(description="Telegram desktop base16 theme generator.")
+    parser = argparse.ArgumentParser(description=f"Telegram desktop base16 theme generator. You can find all themes in {URL_BASE16_ALL_THEMES}.")
     parser.add_argument("-u", "--update-theme-pattern", action='store_true', help="Rewrite and update theme template file.")
     parser.add_argument("-b", "--base16-theme", type=str, default="local", help="Base16 theme name to use.")
 
