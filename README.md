@@ -1,5 +1,5 @@
 # telegram_base16_theme
-
+```
 usage: main.py [-h] [-u] [-b BASE16_THEME]                                    
 
 Telegram desktop base16 theme generator. You can find all themes in
@@ -11,3 +11,4 @@ options:
                         Rewrite and update theme template file.
   -b BASE16_THEME, --base16-theme BASE16_THEME
                         Base16 theme name to use.
+```
