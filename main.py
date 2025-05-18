@@ -1,3 +1,7 @@
+# ---------
+#  IMPORT
+# ---------
+
 import requests
 import re
 import traceback
@@ -21,6 +25,7 @@ PATH_OUTPUT = "Out theme file"
 # ---------
 # FUNCTIONS
 # ---------
+
 def read_yaml(filepath):
     try:
         with open(filepath, 'r') as file:
@@ -49,13 +54,12 @@ def download_github_theme_pattern(url, colors):
     print("Downloaded theme template file.")
 
 def download_base16_yaml(url):
-    print(f"File '{URL_BASE16_YAML_PATH}' not found.")
-    print("\nPlease choose your theme here: https://tinted-theming.github.io/tinted-gallery/")
-    print("For example, nord.")
-
     while True:
-        theme_name = input("Enter theme name: ")
-        print()
+        if args.base16_theme == None or args.base16_theme == "local":
+            theme_name = input("Enter theme name: ")
+            print()
+        else:
+            theme_name = args.base16_theme
         
         # Получаем содержимое файла
         theme_url = f"https://raw.githubusercontent.com/tinted-theming/schemes/refs/heads/spec-0.11/base16/{theme_name}.yaml"
@@ -64,7 +68,8 @@ def download_base16_yaml(url):
         if response.status_code == 200:
             break
         else:
-            print(f"Error. Theme {theme_name} does not exist. Please repeat.")
+            print(f"Error. Theme '{theme_name}' does not exist. Please repeat.")
+            args.base16_theme = None
 
     # Записываем найденные совпадения в файл
     file_content = response.text
@@ -104,7 +109,7 @@ def add_colors_to_theme_template(theme_template, colors):
         print(f"Файл '{theme_template}' не найден.")
         return
 
-    processed_lines = [add_color_to_line(line) for line in lines]   
+    processed_lines = [add_color_to_line(line, colors) for line in lines]   
 
     try:
         with open(theme_template, 'w') as file:
@@ -114,8 +119,7 @@ def add_colors_to_theme_template(theme_template, colors):
         print(f"Произошла ошибка при записи в файл '{theme_template}': {e}")
 
 def create_tdesktop_theme(colors):
-    palette = colors.get('palette', {})
-    background_color = palette.get('base00') # chat bg img
+    background_color = colors.get('base00') # chat bg img
     if not background_color:
         print("No base00 color.")
         return
@@ -132,6 +136,9 @@ def create_tdesktop_theme(colors):
             for line in src:
                 dst.write(line)
         print(f"File {PATH_THEME_TEMPLATE} copied to colors.tdesktop-theme.")
+
+        # rewrite template copy with colors
+        add_colors_to_theme_template("colors.tdesktop-theme", colors)
 
         try:
             os.mkdir(PATH_OUTPUT)
@@ -163,9 +170,11 @@ def create_tdesktop_theme(colors):
         print("Removed temp files.")
 
 def main():
-
     # yaml check
     if not os.path.exists(URL_BASE16_YAML_PATH):
+        print(f"File '{URL_BASE16_YAML_PATH}' not found.")
+        print("Please choose your theme here: https://tinted-theming.github.io/tinted-gallery/")
+        print("For example, nord.")
         download_base16_yaml(URL_BASE16_ALL_THEMES) # if not
     elif args.base16_theme == LOCAL_THEME: # if yes
         print("Use local theme file.")
@@ -174,6 +183,7 @@ def main():
 
     # create dict with color pallete from yaml
     colors = read_yaml(URL_BASE16_YAML_PATH)
+    colors = colors.get('palette', {})
 
     # download my pattern for theme
     if (not os.path.exists(PATH_THEME_TEMPLATE)) or (args.update_theme_pattern == True) :
@@ -181,9 +191,11 @@ def main():
 
     # creating theme archive
     create_tdesktop_theme(colors)
+
+    print("\nComplited.")
     
 # ---------
-# RUN MAIN!
+# RUIN MAIN
 # ---------
 
 if __name__ == "__main__":
@@ -194,6 +206,7 @@ if __name__ == "__main__":
 
     # Add options in args value
     args = parser.parse_args()
+
     try:
         main()
     except:
