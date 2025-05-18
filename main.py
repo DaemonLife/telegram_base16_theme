@@ -4,26 +4,36 @@ import traceback
 import zipfile
 import os
 from PIL import Image
+import argparse
+import yaml
 
 # ---------
 # CONSTANTS
 # ---------
 
-URL_RAW_THEME = "https://raw.githubusercontent.com/DaemonLife/nixos_hyprland/refs/heads/main/modules/telegram-theme.nix"
+URL_THEME_PATTERN = "https://raw.githubusercontent.com/DaemonLife/nixos_hyprland/refs/heads/main/modules/telegram-theme.nix"
 URL_BASE16_ALL_THEMES = "https://github.com/tinted-theming/schemes/tree/spec-0.11/base16"
+URL_BASE16_YAML_PATH = "base16.yaml"
+LOCAL_THEME = "local"
+PATH_THEME_TEMPLATE = "base16_theme_template.txt"
+PATH_OUTPUT = "Out theme file"
 
 # ---------
 # FUNCTIONS
 # ---------
+def read_yaml(filepath):
+    try:
+        with open(filepath, 'r') as file:
+            data = yaml.safe_load(file)
+        return data
+    except FileNotFoundError:
+        print(f"Ошибка: Файл '{filepath}' не найден.")
+        return None
+    except yaml.YAMLError as e:
+        print(f"Ошибка при чтении YAML файла '{filepath}': {e}")
+        return None
 
-def download_style(url, colors):
-
-    # Функция для замены цветов
-    def replace_colors(string, colors):
-        for key, value in colors.items():
-            string = string.replace(f"#${{{key}}}", value)
-        return string
-
+def download_github_theme_pattern(url, colors):
     # Получаем содержимое файла
     response = requests.get(url)
     file_content = response.text
@@ -33,19 +43,39 @@ def download_style(url, colors):
     matches = re.findall(pattern, file_content, re.DOTALL)
 
     # Записываем найденные совпадения в файл
-    with open('colors.tdesktop-theme', 'w', encoding='utf-8') as output_file:
+    with open(PATH_THEME_TEMPLATE, 'w', encoding='utf-8') as output_file:
         for match in matches:
-            match = replace_colors(match, colors)
-            # Удаляем пробелы в начале строк и записываем в файл
             output_file.write(match.replace('  ', '') + '\n')
+    print("Downloaded theme template file.")
 
-    print("Стиль записан в colors.tdesktop-theme")
+def download_base16_yaml(url):
+    print(f"File '{URL_BASE16_YAML_PATH}' not found.")
+    print("\nPlease choose your theme here: https://tinted-theming.github.io/tinted-gallery/")
+    print("For example, nord.")
 
-def read_yaml(yaml_file_path):
+    while True:
+        theme_name = input("Enter theme name: ")
+        print()
+        
+        # Получаем содержимое файла
+        theme_url = f"https://raw.githubusercontent.com/tinted-theming/schemes/refs/heads/spec-0.11/base16/{theme_name}.yaml"
+        response = requests.get(theme_url)
+
+        if response.status_code == 200:
+            break
+        else:
+            print(f"Error. Theme {theme_name} does not exist. Please repeat.")
+
+    # Записываем найденные совпадения в файл
+    file_content = response.text
+    with open(URL_BASE16_YAML_PATH, 'w', encoding='utf-8') as output_file:
+        output_file.write(file_content)
+
+def read_base16_yaml(base16_yaml):
     colors = {}
 
     # Читаем YAML-файл
-    with open(yaml_file_path, 'r', encoding='utf-8') as file:
+    with open(base16_yaml, 'r', encoding='utf-8') as file:
         content = file.read()  # Читаем весь файл
 
     # Используем регулярное выражение для поиска переменных
@@ -58,66 +88,112 @@ def read_yaml(yaml_file_path):
         key = key.strip()  # Убираем пробелы вокруг ключа
         value = value.strip().strip('"')  # Убираем пробелы и кавычки вокруг значения
         colors[key] = value  # Сохраняем ключ и значение в словаре
-
-    # print("\nВсе переменные:\n")
-    # for k, v in colors.items():
-    #     print(f"{k}: {v}")
-    # print()
-
+        
     return colors
 
-def create_theme_file(colors):
+def add_color_to_line(line, colors):
+    for key, value in colors.items():
+        line = line.replace(f"#${{{key}}}", value)
+    return line
 
-    # Удаляем временные файлы
+def add_colors_to_theme_template(theme_template, colors):
     try:
-        os.remove("background.jpg")
-    except:
-        pass
-    try:
-        os.remove("telegram-base16.tdesktop-theme")
-    except:
-        pass
+        with open(theme_template, 'r') as file:
+            lines = file.readlines()
+    except FileNotFoundError:
+        print(f"Файл '{theme_template}' не найден.")
+        return
 
-    # Создаем изображение
+    processed_lines = [add_color_to_line(line) for line in lines]   
+
+    try:
+        with open(theme_template, 'w') as file:
+            file.writelines(processed_lines)
+        print(f"Файл '{theme_template}' успешно обработан и перезаписан.")
+    except Exception as e:
+        print(f"Произошла ошибка при записи в файл '{theme_template}': {e}")
+
+def create_tdesktop_theme(colors):
+    palette = colors.get('palette', {})
+    background_color = palette.get('base00') # chat bg img
+    if not background_color:
+        print("No base00 color.")
+        return
+
     image_size = (2960, 2960)
-    background_color = colors["base00"];
-    image = Image.new("RGB", image_size, background_color)
-    image.save("background.jpg")
 
-    # Создаем zip-архив
-    with zipfile.ZipFile("telegram-base16.tdesktop-theme", "w") as zipf:
-        zipf.write("colors.tdesktop-theme")
-        zipf.write("background.jpg")
+    try: 
+        image = Image.new("RGB", image_size, background_color)
+        image.save("background.jpg")
+        print("Created background.jpg.")
 
-    # Удаляем временные файлы
-    os.remove("background.jpg")
-    os.remove("colors.tdesktop-theme")
+        # copy PATH_THEME_TEMPLATE to colors.tdesktop-theme
+        with open(PATH_THEME_TEMPLATE, 'rb') as src, open("colors.tdesktop-theme", 'wb') as dst:
+            for line in src:
+                dst.write(line)
+        print(f"File {PATH_THEME_TEMPLATE} copied to colors.tdesktop-theme.")
 
-def find_themes(url):
-    print("\nChoose your theme here: https://tinted-theming.github.io/tinted-gallery/")
-    theme_name = input("Enter theme name: ")
-    print()
-    theme_url = f"https://raw.githubusercontent.com/tinted-theming/schemes/refs/heads/spec-0.11/base16/{theme_name}.yaml"
+        try:
+            os.mkdir(PATH_OUTPUT)
+            print(f"Created '{PATH_OUTPUT}' directory.")
+        except FileExistsError:
+            pass
+        except Exception as e:
+            print(f"Error with create directory: {e}")
 
-    # Получаем содержимое файла
-    response = requests.get(theme_url)
-    file_content = response.text
+        path = os.path.join(PATH_OUTPUT, "telegram-base16.tdesktop-theme")
 
-    # Записываем найденные совпадения в файл
-    with open('base16.yaml', 'w', encoding='utf-8') as output_file:
-        output_file.write(file_content)
+        # Create theme archive
+        with zipfile.ZipFile(path, "w") as zipf:
+            zipf.write("colors.tdesktop-theme")
+            zipf.write("background.jpg")
+        print(f"Theme archive 'telegram-base16.tdesktop-theme' created in {PATH_OUTPUT} directory.")
+        
+    except Exception as e:
+        print(f"Archive creation error: {e}")
+        return
+    
+    finally:
+        # Remove temp files
+        for temp_file in ["background.jpg", "colors.tdesktop-theme"]:
+            try:
+                os.remove(temp_file)
+            except FileNotFoundError:
+                pass
+        print("Removed temp files.")
 
 def main():
-    find_themes(URL_BASE16_ALL_THEMES)
-    colors = read_yaml("base16.yaml")
-    download_style(URL_RAW_THEME, colors)
-    create_theme_file(colors)
+
+    # yaml check
+    if not os.path.exists(URL_BASE16_YAML_PATH):
+        download_base16_yaml(URL_BASE16_ALL_THEMES) # if not
+    elif args.base16_theme == LOCAL_THEME: # if yes
+        print("Use local theme file.")
+    else:
+        download_base16_yaml(URL_BASE16_ALL_THEMES)
+
+    # create dict with color pallete from yaml
+    colors = read_yaml(URL_BASE16_YAML_PATH)
+
+    # download my pattern for theme
+    if (not os.path.exists(PATH_THEME_TEMPLATE)) or (args.update_theme_pattern == True) :
+        download_github_theme_pattern(URL_THEME_PATTERN, colors)
+
+    # creating theme archive
+    create_tdesktop_theme(colors)
     
 # ---------
 # RUN MAIN!
 # ---------
 
 if __name__ == "__main__":
+    # Program options
+    parser = argparse.ArgumentParser(description="Telegram desktop base16 theme generator.")
+    parser.add_argument("-u", "--update-theme-pattern", action='store_true', help="Rewrite and update theme template file.")
+    parser.add_argument("-b", "--base16-theme", type=str, default="local", help="Base16 theme name to use.")
+
+    # Add options in args value
+    args = parser.parse_args()
     try:
         main()
     except:
