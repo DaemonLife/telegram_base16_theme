@@ -18,27 +18,15 @@ import yaml
 URL_THEME_PATTERN = "https://raw.githubusercontent.com/DaemonLife/nixos_hyprland/refs/heads/main/modules/telegram-theme.nix"
 URL_BASE16_ALL_THEMES = "https://github.com/tinted-theming/schemes/tree/spec-0.11/base16"
 URL_BASE16_YAML_PATH = "base16.yaml"
-LOCAL_THEME = "local"
 PATH_THEME_TEMPLATE = "base16_theme_template.txt"
-PATH_OUTPUT = "Out theme file"
+PATH_OUTPUT_DIRECTORY = "Out theme file"
+LOCAL_THEME = "local"
 
 # ---------
 # FUNCTIONS
 # ---------
 
-def read_yaml(filepath):
-    try:
-        with open(filepath, 'r') as file:
-            data = yaml.safe_load(file)
-        return data
-    except FileNotFoundError:
-        print(f"Ошибка: Файл '{filepath}' не найден.")
-        return None
-    except yaml.YAMLError as e:
-        print(f"Ошибка при чтении YAML файла '{filepath}': {e}")
-        return None
-
-def download_github_theme_pattern(url, colors):
+def download_theme_pattern(url, colors):
     # Получаем содержимое файла
     response = requests.get(url)
     file_content = response.text
@@ -76,32 +64,24 @@ def download_base16_yaml(url):
     with open(URL_BASE16_YAML_PATH, 'w', encoding='utf-8') as output_file:
         output_file.write(file_content)
 
-def read_base16_yaml(base16_yaml):
-    colors = {}
-
-    # Читаем YAML-файл
-    with open(base16_yaml, 'r', encoding='utf-8') as file:
-        content = file.read()  # Читаем весь файл
-
-    # Используем регулярное выражение для поиска переменных
-    pattern = r'(\s*base[0-9A-Fa-f]{2}:\s*"(.*?)")'
-    matches = re.findall(pattern, content)
-
-    # Заполняем словарь переменными
-    for match in matches:
-        key, value = match[0].split(':', 1)  # Разделяем по двоеточию
-        key = key.strip()  # Убираем пробелы вокруг ключа
-        value = value.strip().strip('"')  # Убираем пробелы и кавычки вокруг значения
-        colors[key] = value  # Сохраняем ключ и значение в словаре
-        
-    return colors
-
-def add_color_to_line(line, colors):
-    for key, value in colors.items():
-        line = line.replace(f"#${{{key}}}", value)
-    return line
+def read_base16_yaml(filepath):
+    try:
+        with open(filepath, 'r') as file:
+            data = yaml.safe_load(file)
+        return data
+    except FileNotFoundError:
+        print(f"Ошибка: Файл '{filepath}' не найден.")
+        return None
+    except yaml.YAMLError as e:
+        print(f"Ошибка при чтении YAML файла '{filepath}': {e}")
+        return None
 
 def add_colors_to_theme_template(theme_template, colors):
+    def add_color_to_line(line, colors):
+        for key, value in colors.items():
+            line = line.replace(f"#${{{key}}}", value)
+        return line
+
     try:
         with open(theme_template, 'r') as file:
             lines = file.readlines()
@@ -141,20 +121,20 @@ def create_tdesktop_theme(colors):
         add_colors_to_theme_template("colors.tdesktop-theme", colors)
 
         try:
-            os.mkdir(PATH_OUTPUT)
-            print(f"Created '{PATH_OUTPUT}' directory.")
+            os.mkdir(PATH_OUTPUT_DIRECTORY)
+            print(f"Created '{PATH_OUTPUT_DIRECTORY}' directory.")
         except FileExistsError:
             pass
         except Exception as e:
             print(f"Error with create directory: {e}")
 
-        path = os.path.join(PATH_OUTPUT, "telegram-base16.tdesktop-theme")
+        path = os.path.join(PATH_OUTPUT_DIRECTORY, "telegram-base16.tdesktop-theme")
 
         # Create theme archive
         with zipfile.ZipFile(path, "w") as zipf:
             zipf.write("colors.tdesktop-theme")
             zipf.write("background.jpg")
-        print(f"Theme archive 'telegram-base16.tdesktop-theme' created in {PATH_OUTPUT} directory.")
+        print(f"Theme archive 'telegram-base16.tdesktop-theme' created in {PATH_OUTPUT_DIRECTORY} directory.")
         
     except Exception as e:
         print(f"Archive creation error: {e}")
@@ -182,12 +162,12 @@ def main():
         download_base16_yaml(URL_BASE16_ALL_THEMES)
 
     # create dict with color pallete from yaml
-    colors = read_yaml(URL_BASE16_YAML_PATH)
+    colors = read_base16_yaml(URL_BASE16_YAML_PATH)
     colors = colors.get('palette', {})
 
     # download my pattern for theme
     if (not os.path.exists(PATH_THEME_TEMPLATE)) or (args.update_theme_pattern == True) :
-        download_github_theme_pattern(URL_THEME_PATTERN, colors)
+        download_theme_pattern(URL_THEME_PATTERN, colors)
 
     # creating theme archive
     create_tdesktop_theme(colors)
