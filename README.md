@@ -3,19 +3,20 @@
 This program creates a Base16 theme for the Telegram Desktop using a template with [parameters](https://github.com/DaemonLife/nixos_hyprland/blob/main/modules/telegram-theme.nix) from my NixOS repository and substituting colors from the [Base16 palette](https://github.com/tinted-theming/schemes/tree/spec-0.11/base16) you choose.
 
 ## Install
-Download zip and unzip it or use command: `git clone https://github.com/DaemonLife/telegram_base16_theme.git`\
-Open directory telegram_base16_theme-main.\
-Create virtual environment: `python -m venv venv`
+1. Download zip and unzip it or use command:\
+`git clone https://github.com/DaemonLife/telegram_base16_theme.git`
+2. Open directory telegram_base16_theme-main.
+3. Create virtual environment: `python -m venv venv`
 
-Activate the virtual environment.\
+4. Activate the virtual environment.\
 For Windows: `venv\Scripts\activate.bat`\
 For Linux and MacOS: `source venv/bin/activate`
 
-Install requirements: `pip install -r requirements.txt`
+5. Install requirements: `pip install -r requirements.txt`
 
 ## Run
-Activate the virtual environment again if you have exited.\
-And run: `python main.py -b [BASE16_THEME]`
+1. Activate the virtual environment again if you have exited.
+2. And run: `python main.py -b [BASE16_THEME]`
 
 If you don't know the names of the themes, look at Help or this: https://tinted-theming.github.io/tinted-gallery/
 
