@@ -4,7 +4,8 @@ This program creates a Base16 theme for the Telegram Desktop using a template wi
 To use your local template, you should not use the -u option, it updates the template. To use a local palette, simply do not use the -b option or use it with the value 'local'.
 
 # Install
-Download: `git clone https://github.com/DaemonLife/telegram_base16_theme.git`\
+Download zip and unzip it or use command: `git clone https://github.com/DaemonLife/telegram_base16_theme.git`\
+Open directory telegram_base16_theme-main.\
 Create virtual environment: `python -m venv venv`
 
 Activate the virtual environment.\
