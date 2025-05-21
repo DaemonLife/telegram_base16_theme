@@ -1,5 +1,5 @@
 # Description
-This program creates a Base16 theme for the Telegram Desktop using a template with parameters from my NIXOS repository and substituting colors from the Base16 palette you choose using https://github.com/tinted-theming/schemes/tree/spec-0.11/base16.
+This program creates a Base16 theme for the Telegram Desktop using a template with [parameters](https://github.com/DaemonLife/nixos_hyprland/blob/main/modules/telegram-theme.nix) from my NIXOS repository and substituting colors from the [Base16 palette](https://github.com/tinted-theming/schemes/tree/spec-0.11/base16) you choose.
 
 To use your local template, you should not use the -u option, it updates the template. To use a local palette, simply do not use the -b option or use it with the value 'local'.
 
