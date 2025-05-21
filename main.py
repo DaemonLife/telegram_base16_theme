@@ -22,6 +22,17 @@ PATH_THEME_TEMPLATE = "base16_theme_template.txt"
 PATH_OUTPUT_DIRECTORY = "Out theme file"
 LOCAL_THEME = "local"
 
+DESCRIPTION = '''
+Telegram desktop base16 theme generator.
+
+You can easily find all themes in gallery:
+  https://tinted-theming.github.io/tinted-gallery/
+The current link to the gallery is always stored in this repository:
+  https://github.com/tinted-theming/schemes?tab=readme-ov-file
+Or you can find themes in this directory:
+  https://github.com/tinted-theming/schemes/tree/spec-0.11/base16.
+'''
+
 # ---------
 # FUNCTIONS
 # ---------
@@ -99,9 +110,9 @@ def add_colors_to_theme_template(theme_template, colors):
         print(f"Произошла ошибка при записи в файл '{theme_template}': {e}")
 
 def create_tdesktop_theme(colors):
-    background_color = colors.get('base00') # chat bg img
+    background_color = colors.get('base02') # chat bg img
     if not background_color:
-        print("No base00 color.")
+        print("No base02 color.")
         return
 
     image_size = (2960, 2960)
@@ -180,7 +191,7 @@ def main():
 
 if __name__ == "__main__":
     # Program options
-    parser = argparse.ArgumentParser(description=f"Telegram desktop base16 theme generator. You can find all themes in https://tinted-theming.github.io/tinted-gallery/.")
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument("-u", "--update-theme-pattern", action='store_true', help="Rewrite and update theme template file. Default is 'False'.")
     parser.add_argument("-b", "--base16-theme", type=str, default="local", help="Base16 theme name to use. Default is 'local'.")
 
