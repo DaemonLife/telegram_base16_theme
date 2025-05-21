@@ -25,7 +25,10 @@ usage: main.py [-h] [-u] [-b BASE16_THEME]
 Telegram desktop base16 theme generator.
 You can easily find all themes in gallery:
 https://tinted-theming.github.io/tinted-gallery/
-Or in repository directory:
+The current link to the gallery is always stored in this repository:
+https://github.com/tinted-theming/schemes?tab=readme-ov-file
+
+Or you can find theme in this directory:
 https://github.com/tinted-theming/schemes/tree/spec-0.11/base16.
 
 options:
