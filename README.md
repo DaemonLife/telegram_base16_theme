@@ -16,7 +16,7 @@ Install requirements: `pip install -r requirements.txt`
 
 # Run
 Activate the virtual environment again if you have exited.\
-And run: `python main.py -b [THEME_NAME]`\
+And run: `python main.py -b [BASE16_THEME]`\
 If you don't know the names of the themes, look at Help or this: https://tinted-theming.github.io/tinted-gallery/
 
 # Help
