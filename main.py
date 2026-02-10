@@ -19,7 +19,7 @@ URL_THEME_PATTERN = "https://raw.githubusercontent.com/DaemonLife/nixos_hyprland
 URL_BASE16_ALL_THEMES = "https://github.com/tinted-theming/schemes/tree/spec-0.11/base16"
 URL_BASE16_YAML_PATH = "base16.yaml"
 PATH_THEME_TEMPLATE = "base16_theme_template.txt"
-PATH_OUTPUT_DIRECTORY = "Out theme file"
+PATH_OUTPUT_DIRECTORY = "TelegramTheme"
 LOCAL_THEME = "local"
 
 DESCRIPTION = '''
@@ -67,7 +67,7 @@ def download_base16_yaml(url):
         if response.status_code == 200:
             break
         else:
-            print(f"Error. Theme '{theme_name}' does not exist. Please repeat.")
+            print(f"Error. Theme '{theme_name}' base16 does not exist. Please repeat.")
             args.base16_theme = None
 
     # Записываем найденные совпадения в файл
@@ -81,10 +81,10 @@ def read_base16_yaml(filepath):
             data = yaml.safe_load(file)
         return data
     except FileNotFoundError:
-        print(f"Ошибка: Файл '{filepath}' не найден.")
+        print(f"File '{filepath}' not found.")
         return None
     except yaml.YAMLError as e:
-        print(f"Ошибка при чтении YAML файла '{filepath}': {e}")
+        print(f"Error reading YAML file '{filepath}': {e}")
         return None
 
 def add_colors_to_theme_template(theme_template, colors):
@@ -97,7 +97,7 @@ def add_colors_to_theme_template(theme_template, colors):
         with open(theme_template, 'r') as file:
             lines = file.readlines()
     except FileNotFoundError:
-        print(f"Файл '{theme_template}' не найден.")
+        print(f"File '{theme_template}' not found.")
         return
 
     processed_lines = [add_color_to_line(line, colors) for line in lines]   
@@ -105,7 +105,7 @@ def add_colors_to_theme_template(theme_template, colors):
     try:
         with open(theme_template, 'w') as file:
             file.writelines(processed_lines)
-        print(f"Файл '{theme_template}' успешно обработан и перезаписан.")
+        print(f"File '{theme_template}' successfully processed and overwritten.")
     except Exception as e:
         print(f"Произошла ошибка при записи в файл '{theme_template}': {e}")
 
@@ -164,7 +164,7 @@ def main():
     # yaml check
     if not os.path.exists(URL_BASE16_YAML_PATH):
         print(f"File '{URL_BASE16_YAML_PATH}' not found.")
-        print("Please choose your theme here: https://tinted-theming.github.io/tinted-gallery/")
+        print("Please choose your base16 (not base24) theme here: https://tinted-theming.github.io/tinted-gallery/")
         print("For example, nord.")
         download_base16_yaml(URL_BASE16_ALL_THEMES) # if not
     elif args.base16_theme == LOCAL_THEME: # if yes
@@ -186,7 +186,7 @@ def main():
     print("\nComplited.")
     
 # ---------
-# RUIN MAIN
+# RUiN MAIN
 # ---------
 
 if __name__ == "__main__":
