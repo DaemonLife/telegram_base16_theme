@@ -1,6 +1,6 @@
 # Telegram Base16 theme generator 🎨
 ## Description
-This program creates a Base16 theme for the Telegram Desktop using a template with [parameters](https://github.com/DaemonLife/nixos_hyprland/blob/main/modules/telegram-theme.nix) from my NixOS repository and substituting colors from the [Base16 palette](https://github.com/tinted-theming/schemes/tree/spec-0.11/base16) you choose.
+This program creates a Base16 theme for the Telegram Desktop using a template with [parameters](https://github.com/DaemonLife/nixos/blob/main/modules/telegram/telegram_base16_theme.nix) from my NixOS repository and substituting colors from the [Base16 palette](https://github.com/tinted-theming/schemes/tree/spec-0.11/base16) you choose.
 
 ## Install
 1. Download zip and unzip it or use command:\
