@@ -15,7 +15,7 @@ import yaml
 # CONSTANTS
 # ---------
 
-URL_THEME_PATTERN = "https://raw.githubusercontent.com/DaemonLife/nixos_hyprland/refs/heads/main/modules/telegram-theme.nix"
+URL_THEME_PATTERN = "https://raw.githubusercontent.com/DaemonLife/nixos_hyprland/refs/heads/main/modules/telegram/telegram_base16_theme.nix"
 URL_BASE16_ALL_THEMES = "https://github.com/tinted-theming/schemes/tree/spec-0.11/base16"
 URL_BASE16_YAML_PATH = "base16.yaml"
 PATH_THEME_TEMPLATE = "base16_theme_template.txt"
