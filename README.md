@@ -6,13 +6,14 @@ This program creates a Base16 theme for the Telegram Desktop using a template wi
 1. Download zip and unzip it or use command:\
 `git clone https://github.com/DaemonLife/telegram_base16_theme.git`
 2. Open directory telegram_base16_theme-main.
-3. Create virtual environment: `python -m venv venv`
+3. If you are using NixOS run `nix-shell` for acivating virtual environment and skip the other steps.
+4. Create virtual environment: `python -m venv venv`
 
-4. Activate the virtual environment.\
+5. Activate the virtual environment.\
 For Windows: `venv\Scripts\activate.bat`\
 For Linux and MacOS: `source venv/bin/activate`
 
-5. Install requirements: `pip install -r requirements.txt`
+6. Install requirements: `pip install -r requirements.txt`
 
 ## Run
 1. Activate the virtual environment again if you have exited.
